@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Taper">
+<meta name="theme-color" content="#1a4d3e">
+<title>Taper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Spline+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --paper:#fbf9f4; --ink:#23241f; --soft:#6f6d63; --faint:#a39f93;
+    --line:rgba(35,36,31,0.09); --line2:rgba(35,36,31,0.16);
+    --moss:#1a4d3e; --moss2:#2f7a5f; --mosstint:#e3ede7;
+    --clay:#b5532f; --claytint:#f3e2d9; --gold:#8a6410; --goldtint:#f1e7cf;
+    --shadow:0 1px 2px rgba(35,36,31,0.05),0 6px 18px rgba(35,36,31,0.06);
+    --disp:'Fraunces',Georgia,serif; --sans:'Spline Sans',-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#15161a; --paper:#1e1f24; --ink:#ecebe4; --soft:#a3a199; --faint:#6d6b64;
+      --line:rgba(255,255,255,0.09); --line2:rgba(255,255,255,0.16);
+      --moss:#6fcaa6; --moss2:#4fae89; --mosstint:#1a2f28;
+      --clay:#e89070; --claytint:#34211a; --gold:#d9b35e; --goldtint:#322a17;
+      --shadow:0 1px 2px rgba(0,0,0,0.3),0 6px 20px rgba(0,0,0,0.35);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:540px;margin:0 auto;padding:20px 16px 70px;}
+  header{margin-bottom:20px;}
+  .kick{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--moss2);font-weight:600;margin:0 0 2px;}
+  h1{font-family:var(--disp);font-size:34px;font-weight:600;margin:0;letter-spacing:-0.02em;}
+  .reset{position:absolute;top:env(safe-area-inset-top);right:16px;margin-top:24px;font-size:12px;color:var(--faint);background:none;border:none;cursor:pointer;font-family:var(--sans);}
+  .tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--paper);padding:4px;border-radius:14px;border:0.5px solid var(--line);box-shadow:var(--shadow);}
+  .tab{flex:1;text-align:center;padding:10px 4px;border-radius:10px;font-size:13.5px;font-weight:500;color:var(--soft);cursor:pointer;border:none;background:none;font-family:var(--sans);transition:all .25s;}
+  .tab.on{background:var(--moss);color:#fbf9f4;}
+  @media (prefers-color-scheme:dark){.tab.on{color:#10241d;}}
+  .pane{animation:fade .4s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .hide{display:none;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+  .stat{background:var(--paper);border-radius:14px;padding:14px 12px;border:0.5px solid var(--line);box-shadow:var(--shadow);}
+  .stat .l{font-size:11px;color:var(--soft);margin:0 0 4px;letter-spacing:0.02em;}
+  .stat .v{font-family:var(--disp);font-size:24px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+  .wk{display:flex;gap:12px;align-items:flex-start;background:var(--paper);border:0.5px solid var(--line);border-radius:15px;padding:14px 15px;margin-bottom:9px;box-shadow:var(--shadow);transition:opacity .3s,transform .15s;}
+  .wk:active{transform:scale(0.992);}
+  .wk.done{opacity:0.52;}
+  .box{flex-shrink:0;width:28px;height:28px;border-radius:9px;border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:15px;color:#fbf9f4;background:none;cursor:pointer;transition:all .2s;}
+  .wk.done .box{background:var(--moss);border-color:var(--moss);}
+  @media (prefers-color-scheme:dark){.wk.done .box{color:#10241d;}}
+  .wk .hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+  .wk .nm{font-weight:600;font-size:15px;}
+  .wk.done .nm{text-decoration:line-through;}
+  .pill{font-size:11px;padding:3px 9px;border-radius:7px;font-weight:600;letter-spacing:0.01em;}
+  .p1{background:var(--mosstint);color:var(--moss);}
+  .p2{background:var(--goldtint);color:var(--gold);}
+  .p3{background:var(--claytint);color:var(--clay);}
+  .focus{font-size:11px;color:var(--faint);}
+  .wk .tx{font-size:13.5px;color:var(--soft);margin:0;}
+  .card{background:var(--paper);border:0.5px solid var(--line);border-radius:18px;padding:24px 20px;box-shadow:var(--shadow);margin-bottom:14px;}
+  .ring-wrap{display:flex;flex-direction:column;align-items:center;}
+  .ring{position:relative;width:200px;height:200px;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ring .big{font-family:var(--disp);font-size:48px;font-weight:600;line-height:1;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+  .ring .unit{font-size:13px;color:var(--soft);margin-top:4px;}
+  .tstatus{text-align:center;font-size:14px;font-weight:500;margin:16px 0 0;}
+  .ok{color:var(--moss2);}.wait{color:var(--gold);}
+  .goalrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px 0 0;font-size:13px;color:var(--soft);}
+  select{font-family:var(--sans);font-size:14px;padding:7px 10px;border-radius:9px;border:0.5px solid var(--line2);background:var(--paper);color:var(--ink);}
+  button.act{font-family:var(--sans);font-size:15px;font-weight:600;padding:15px 18px;border-radius:13px;border:none;cursor:pointer;width:100%;transition:transform .12s,filter .2s;}
+  button.act:active{transform:scale(0.97);}
+  .primary{background:var(--moss);color:#fbf9f4;}
+  @media (prefers-color-scheme:dark){.primary{color:#10241d;}}
+  .ghost{background:var(--paper);color:var(--ink);border:0.5px solid var(--line2);}
+  .count-big{font-family:var(--disp);font-size:72px;font-weight:600;line-height:1;margin:6px 0;font-variant-numeric:tabular-nums;letter-spacing:-0.03em;}
+  .count-sub{font-size:13px;color:var(--soft);margin:0;}
+  .cbtns{display:flex;gap:10px;margin-top:20px;}
+  .cbtns button{flex:1;}
+  .chart-h{font-family:var(--disp);font-size:18px;font-weight:600;margin:0 0 2px;}
+  .chart-sub{font-size:12px;color:var(--soft);margin:0 0 14px;}
+  canvas{width:100%;display:block;}
+  .empty{text-align:center;color:var(--faint);font-size:13.5px;padding:24px 10px;line-height:1.6;}
+  .trend{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:7px;}
+  .down{background:var(--mosstint);color:var(--moss);}
+  .up{background:var(--mosstint);color:var(--moss);}
+  .small{font-size:12px;color:var(--faint);text-align:center;margin-top:20px;line-height:1.6;}
+  .seg{display:flex;gap:6px;justify-content:center;margin-bottom:14px;}
+  .seg button{font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 14px;border-radius:8px;border:0.5px solid var(--line2);background:none;color:var(--soft);cursor:pointer;}
+  .seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="reset" onclick="resetAll()">Reset</button>
+  <header>
+    <p class="kick">Day <span id="day-num">1</span></p>
+    <h1>Taper</h1>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-t="plan" onclick="tab('plan')">Plan</button>
+    <button class="tab" data-t="timer" onclick="tab('timer')">Timer</button>
+    <button class="tab" data-t="today" onclick="tab('today')">Today</button>
+    <button class="tab" data-t="trends" onclick="tab('trends')">Trends</button>
+  </div>
+
+  <div id="plan" class="pane">
+    <div class="stats">
+      <div class="stat"><p class="l">Phase</p><p class="v" id="s-phase">1/3</p></div>
+      <div class="stat"><p class="l">Nic level</p><p class="v" id="s-nic">35</p></div>
+      <div class="stat"><p class="l">Weeks</p><p class="v" id="s-done">0/12</p></div>
+    </div>
+    <div id="weeklist"></div>
+  </div>
+
+  <div id="timer" class="pane hide">
+    <div class="card ring-wrap">
+      <div class="ring">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="90" fill="none" stroke="var(--line)" stroke-width="10"/>
+          <circle id="ring-fill" cx="100" cy="100" r="90" fill="none" stroke="var(--moss)" stroke-width="10" stroke-linecap="round" stroke-dasharray="565.5" stroke-dashoffset="565.5" style="transition:stroke-dashoffset .9s ease,stroke .4s;"/>
+        </svg>
+        <div class="mid">
+          <span class="big" id="t-elapsed">&mdash;</span>
+          <span class="unit" id="t-unit">tap when you vape</span>
+        </div>
+      </div>
+      <p class="tstatus" id="t-status">No hits logged yet today</p>
+    </div>
+    <div class="goalrow">
+      Target gap
+      <select id="t-goal" onchange="saveGoal()">
+        <option value="20">20 min</option><option value="30">30 min</option>
+        <option value="45">45 min</option><option value="60">60 min</option>
+        <option value="90">90 min</option><option value="120">2 hours</option>
+      </select>
+    </div>
+    <div style="margin-top:18px;"><button class="act primary" onclick="logHit()">I just vaped</button></div>
+    <p class="small">Tap each time you vape. The ring fills toward your target gap, then turns solid when you clear it. Every tap is timestamped and feeds your trends.</p>
+  </div>
+
+  <div id="today" class="pane hide">
+    <div class="card" style="text-align:center;">
+      <p class="count-sub">Hits today</p>
+      <p class="count-big" id="c-today">0</p>
+      <p class="count-sub" id="c-compare">&mdash;</p>
+      <div class="cbtns">
+        <button class="act ghost" onclick="bump(-1)">&minus;1</button>
+        <button class="act primary" onclick="bump(1)">+1 hit</button>
+      </div>
+    </div>
+    <div class="card">
+      <p class="chart-h">Last 14 days</p>
+      <p class="chart-sub">Hits per day &mdash; watch the line fall</p>
+      <canvas id="mini" height="140"></canvas>
+      <div id="mini-empty" class="empty hide">Log a few days of hits and your daily totals will chart here.</div>
+    </div>
+  </div>
+
+  <div id="trends" class="pane hide">
+    <div class="seg">
+      <button class="on" data-r="14" onclick="setRange(14)">14 days</button>
+      <button data-r="30" onclick="setRange(30)">30 days</button>
+      <button data-r="90" onclick="setRange(90)">All</button>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <div><p class="chart-h">Hits per day</p><p class="chart-sub">Lower is the goal</p></div>
+        <span class="trend down" id="tr-hits">&mdash;</span>
+      </div>
+      <canvas id="chart-hits" height="170"></canvas>
+      <div id="hits-empty" class="empty hide">Not enough data yet.</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <div><p class="chart-h">Average gap between hits</p><p class="chart-sub">Higher is the goal</p></div>
+        <span class="trend up" id="tr-gap">&mdash;</span>
+      </div>
+      <canvas id="chart-gap" height="170"></canvas>
+      <div id="gap-empty" class="empty hide">Log hits on the Timer tab to track your spacing.</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><p class="l">Best day (fewest)</p><p class="v" id="st-best">&mdash;</p></div>
+      <div class="stat"><p class="l">Days tracked</p><p class="v" id="st-days">0</p></div>
+      <div class="stat"><p class="l">Total logged</p><p class="v" id="st-total">0</p></div>
+    </div>
+  </div>
+
+  <p class="small" style="margin-top:26px;">Everything saves on this iPhone only &mdash; no account, fully offline.<br>Advance a week when the current step feels boring, not on a date.</p>
+</div>
+
+<script>
+const WEEKS=[
+  {p:1,n:"35mg",pc:"p1",t:"No hits within 20 min of the last. Keep the device across the room.",f:"Spacing, not dose"},
+  {p:1,n:"35mg",pc:"p1",t:"Stretch to 30 min gaps. Delay the first hit until after teeth + face.",f:"Win the morning"},
+  {p:1,n:"35mg",pc:"p1",t:"45 min gaps. First hit after first coffee. Log every hit.",f:"Measure + space"},
+  {p:2,n:"25mg",pc:"p2",t:"Drop to 25mg. Hold 60 min gaps. You'll barely notice the drop.",f:"First dose cut"},
+  {p:2,n:"25mg",pc:"p2",t:"Hold 25mg. Keep 60 min gaps steady. Let it feel boring.",f:"Stabilize"},
+  {p:2,n:"~12mg",pc:"p2",t:"Blend 25 + 0 roughly half-half. Stretch gaps to 90 min.",f:"Key middle rung"},
+  {p:2,n:"~12mg",pc:"p2",t:"Hold ~12mg. 90 min gaps. Stop vaping while driving.",f:"First unpair"},
+  {p:2,n:"~12mg",pc:"p2",t:"Hold ~12mg. Cut the post-meal and coffee hits.",f:"Unpair eating"},
+  {p:2,n:"~6mg",pc:"p2",t:"Blend lighter &mdash; more 0 than 25. Push to 2 hr gaps.",f:"Final approach"},
+  {p:2,n:"~6mg",pc:"p2",t:"Hold ~6mg. Take on the hard one &mdash; screen / wind-down.",f:"Hardest unpair"},
+  {p:3,n:"0mg",pc:"p3",t:"Go to 0mg. Pure flavor + habit now. Keep a hand-to-mouth swap ready.",f:"Zero drug"},
+  {p:3,n:"0mg",pc:"p3",t:"0mg, long gaps. Decide: set the device down, or coast at 0mg.",f:"Your call"}
+];
+
+function load(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function dkey(ts){const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function today(){return dkey(Date.now());}
+
+let checks=load('tp_checks',{});
+let goal=load('tp_goal',20);
+let lastHit=load('tp_last',null);
+let log=load('tp_log',{});
+let startDay=load('tp_start',null);
+if(!startDay){startDay=today();save('tp_start',startDay);}
+let range=14;
+
+function dayNum(){const a=new Date(startDay),b=new Date(today());return Math.floor((b-a)/864e5)+1;}
+
+function tab(name){
+  ['plan','timer','today','trends'].forEach(t=>document.getElementById(t).classList.toggle('hide',t!==name));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===name));
+  const p=document.querySelector('#'+name);p.classList.remove('pane');void p.offsetWidth;p.classList.add('pane');
+  if(name==='today')drawMini();
+  if(name==='trends')drawTrends();
+}
+
+function renderWeeks(){
+  const c=document.getElementById('weeklist');c.innerHTML='';
+  WEEKS.forEach((w,i)=>{
+    const wk=i+1,on=checks['w'+wk];
+    const el=document.createElement('div');el.className='wk'+(on?' done':'');
+    el.innerHTML='<button class="box" onclick="toggle('+wk+')">'+(on?'\u2713':'')+'</button>'+
+      '<div style="flex:1;min-width:0;"><div class="hd"><span class="nm">Week '+wk+'</span>'+
+      '<span class="pill '+w.pc+'">'+w.n+'</span><span class="focus">'+w.f+'</span></div>'+
+      '<p class="tx">'+w.t+'</p></div>';
+    c.appendChild(el);
+  });
+  const done=Object.values(checks).filter(Boolean).length;
+  document.getElementById('s-done').textContent=done+'/12';
+  let cur=WEEKS[0];
+  for(let i=0;i<WEEKS.length;i++){if(!checks['w'+(i+1)]){cur=WEEKS[i];break;}if(i===WEEKS.length-1)cur=WEEKS[i];}
+  document.getElementById('s-nic').textContent=cur.n.replace('mg','');
+  document.getElementById('s-phase').textContent=cur.p+'/3';
+  document.getElementById('day-num').textContent=dayNum();
+}
+function toggle(wk){checks['w'+wk]=!checks['w'+wk];save('tp_checks',checks);renderWeeks();}
+
+function saveGoal(){goal=parseInt(document.getElementById('t-goal').value);save('tp_goal',goal);renderTimer();}
+function logHit(){
+  const ts=Date.now();lastHit=ts;save('tp_last',ts);
+  const k=today();if(!log[k])log[k]=[];log[k].push(ts);save('tp_log',log);
+  renderTimer();renderToday();
+  if(navigator.vibrate)navigator.vibrate(8);
+}
+function renderTimer(){
+  const big=document.getElementById('t-elapsed'),unit=document.getElementById('t-unit'),
+    st=document.getElementById('t-status'),fill=document.getElementById('ring-fill');
+  const C=565.5;
+  if(!lastHit){big.innerHTML='&mdash;';unit.textContent='tap when you vape';st.textContent='No hits logged yet today';st.className='tstatus';fill.style.strokeDashoffset=C;return;}
+  const sec=Math.floor((Date.now()-lastHit)/1000),m=Math.floor(sec/60),s=sec%60;
+  big.textContent=m;unit.textContent='min '+(s<10?'0':'')+s+'s';
+  const frac=Math.min(1,(sec/60)/goal);
+  fill.style.strokeDashoffset=C*(1-frac);
+  if(m>=goal){fill.style.stroke='var(--moss)';st.textContent='\u2713 Cleared your '+goal+' min target';st.className='tstatus ok';}
+  else{fill.style.stroke='var(--gold)';const left=goal-m-1;st.textContent=left+' min '+(60-s)+'s to target';st.className='tstatus wait';}
+}
+
+function counts(){const o={};for(const k in log)o[k]=log[k].length;return o;}
+function renderToday(){
+  const k=today(),n=(log[k]||[]).length;
+  document.getElementById('c-today').textContent=n;
+  const c=counts();const days=Object.keys(c).sort();
+  const yi=days.indexOf(k)-1;
+  const cmp=document.getElementById('c-compare');
+  if(yi>=0){const y=c[days[yi]];const diff=n-y;cmp.textContent=diff===0?'Same as last logged day':(diff<0?Math.abs(diff)+' fewer than last day':diff+' more than last day');}
+  else cmp.textContent='First day logging \u2014 baseline';
+  if(document.querySelector('#today').classList.contains('hide')===false)drawMini();
+}
+function bump(n){const k=today();if(!log[k])log[k]=[];if(n>0){log[k].push(Date.now());}else{log[k].pop();}save('tp_log',log);renderToday();}
+
+function series(days){
+  const c=counts();const keys=Object.keys(c).sort();
+  if(!keys.length)return{labels:[],hits:[],gaps:[]};
+  const end=new Date(today());const start=new Date(end);start.setDate(end.getDate()-(days-1));
+  const labels=[],hits=[],gaps=[];
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    const k=dkey(d.getTime());labels.push(new Date(d).getDate());
+    hits.push(log[k]?log[k].length:0);
+    const arr=(log[k]||[]).slice().sort((a,b)=>a-b);
+    if(arr.length>=2){let tot=0;for(let i=1;i<arr.length;i++)tot+=arr[i]-arr[i-1];gaps.push(Math.round((tot/(arr.length-1))/60000));}
+    else gaps.push(null);
+  }
+  return{labels,hits,gaps};
+}
+
+function lineChart(id,labels,data,color,emptyId){
+  const cv=document.getElementById(id),box=document.getElementById(emptyId);
+  const real=data.filter(v=>v!==null&&v!==undefined);
+  if(real.length<1){cv.style.display='none';if(box)box.classList.remove('hide');return;}
+  cv.style.display='block';if(box)box.classList.add('hide');
+  const dpr=window.devicePixelRatio||1,W=cv.clientWidth,H=parseInt(cv.getAttribute('height'));
+  cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.scale(dpr,dpr);x.clearRect(0,0,W,H);
+  const pad={l:30,r:8,t:12,b:20};const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const vals=data.map(v=>v===null?0:v);const mx=Math.max(...vals,1)*1.15;
+  const css=getComputedStyle(document.documentElement);
+  const cInk=css.getPropertyValue('--faint').trim(),cLine=css.getPropertyValue('--line').trim(),cCol=css.getPropertyValue(color).trim();
+  x.strokeStyle=cLine;x.lineWidth=1;x.fillStyle=cInk;x.font='10px Spline Sans,sans-serif';x.textAlign='right';
+  for(let g=0;g<=2;g++){const v=mx*g/2,yy=pad.t+ch-(v/mx)*ch;x.beginPath();x.moveTo(pad.l,yy);x.lineTo(W-pad.r,yy);x.stroke();x.fillText(Math.round(v),pad.l-6,yy+3);}
+  const px=i=>pad.l+(data.length<=1?cw/2:cw*i/(data.length-1));
+  const py=v=>pad.t+ch-(v/mx)*ch;
+  let first=null;x.beginPath();
+  data.forEach((v,i)=>{if(v===null)return;const X=px(i),Y=py(v);if(first===null){x.moveTo(X,Y);first=i;}else x.lineTo(X,Y);});
+  if(first!==null){x.lineTo(px(data.length-1),pad.t+ch);x.lineTo(px(first),pad.t+ch);x.closePath();x.fillStyle=cCol+'22';x.fill();}
+  x.beginPath();let started=false;
+  data.forEach((v,i)=>{if(v===null)return;const X=px(i),Y=py(v);if(!started){x.moveTo(X,Y);started=true;}else x.lineTo(X,Y);});
+  x.strokeStyle=cCol;x.lineWidth=2.5;x.lineJoin='round';x.stroke();
+  data.forEach((v,i)=>{if(v===null)return;x.beginPath();x.arc(px(i),py(v),3,0,7);x.fillStyle=cCol;x.fill();});
+  x.fillStyle=cInk;x.textAlign='center';const step=Math.max(1,Math.ceil(labels.length/7));
+  labels.forEach((l,i)=>{if(i%step===0)x.fillText(l,px(i),H-6);});
+}
+
+function pct(arr){const v=arr.filter(a=>a!==null);if(v.length<2)return null;const h=Math.ceil(v.length/2);const a=v.slice(0,h),b=v.slice(h);const av=a.reduce((s,n)=>s+n,0)/a.length,bv=b.reduce((s,n)=>s+n,0)/b.length;if(av===0)return null;return Math.round((bv-av)/av*100);}
+
+function drawMini(){const s=series(14);lineChart('mini',s.labels,s.hits,'--moss','mini-empty');}
+function drawTrends(){
+  const s=series(range);
+  lineChart('chart-hits',s.labels,s.hits,'--clay','hits-empty');
+  lineChart('chart-gap',s.labels,s.gaps,'--moss','gap-empty');
+  const hp=pct(s.hits);const th=document.getElementById('tr-hits');
+  if(hp===null){th.innerHTML='&mdash;';th.className='trend down';}else{th.textContent=(hp<=0?'\u2193 ':'\u2191 ')+Math.abs(hp)+'%';th.className='trend '+(hp<=0?'down':'up');}
+  const gp=pct(s.gaps);const tg=document.getElementById('tr-gap');
+  if(gp===null){tg.innerHTML='&mdash;';tg.className='trend up';}else{tg.textContent=(gp>=0?'\u2191 ':'\u2193 ')+Math.abs(gp)+'%';tg.className='trend '+(gp>=0?'up':'down');}
+  const c=counts();const ks=Object.keys(c);
+  document.getElementById('st-days').textContent=ks.length;
+  document.getElementById('st-total').textContent=ks.reduce((t,k)=>t+c[k],0);
+  const nz=ks.filter(k=>c[k]>0);document.getElementById('st-best').textContent=nz.length?Math.min(...nz.map(k=>c[k])):'\u2014';
+}
+function setRange(r){range=r;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',+b.dataset.r===r));drawTrends();}
+
+function resetAll(){if(confirm('Reset everything \u2014 checkmarks, timer, and all logged hit history?')){checks={};goal=20;lastHit=null;log={};startDay=today();save('tp_checks',checks);save('tp_goal',goal);save('tp_last',lastHit);save('tp_log',log);save('tp_start',startDay);document.getElementById('t-goal').value='20';renderWeeks();renderTimer();renderToday();}}
+
+document.getElementById('t-goal').value=String(goal);
+renderWeeks();renderTimer();renderToday();
+setInterval(renderTimer,1000);
+window.addEventListener('resize',()=>{if(!document.querySelector('#trends').classList.contains('hide'))drawTrends();if(!document.querySelector('#today').classList.contains('hide'))drawMini();});
+</script>
+</body>
+</html>
