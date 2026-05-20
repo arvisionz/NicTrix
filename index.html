@@ -120,6 +120,12 @@
       <div class="stat"><p class="l">Weeks</p><p class="v" id="s-done">0/12</p></div>
     </div>
     <div id="weeklist"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="act ghost" onclick="exportData()" style="font-size:14px;">Back up my data</button>
+      <button class="act ghost" onclick="document.getElementById('import-file').click()" style="font-size:14px;">Restore</button>
+    </div>
+    <input type="file" id="import-file" accept="application/json,.json" style="display:none;" onchange="importData(event)">
+    <p class="small" id="backup-note" style="margin-top:10px;">Your data saves automatically on this phone. Back up now and then to a file you keep safe &mdash; protects against iOS clearing storage if the app sits unused.</p>
   </div>
 
   <div id="timer" class="pane hide">
@@ -350,6 +356,41 @@ function drawTrends(){
 }
 function setRange(r){range=r;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',+b.dataset.r===r));drawTrends();}
 
+function exportData(){
+  const payload={app:'NicTrix',version:2,exported:new Date().toISOString(),
+    data:{tp_checks:checks,tp_goal:goal,tp_last:lastHit,tp_log:log,tp_start:startDay}};
+  const txt=JSON.stringify(payload,null,2);
+  const blob=new Blob([txt],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const d=new Date();const stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const a=document.createElement('a');a.href=url;a.download='nictrix-backup-'+stamp+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+  const note=document.getElementById('backup-note');
+  note.textContent='\u2713 Backup file created. On iPhone, choose "Save to Files" or AirDrop it to yourself to keep it safe.';
+  note.style.color='var(--moss2)';
+}
+function importData(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const p=JSON.parse(e.target.result);
+      const d=(p&&p.data)?p.data:p;
+      if(!d||typeof d!=='object')throw new Error('bad file');
+      if(!confirm('Restore this backup? It will replace everything currently in NicTrix on this phone.'))return;
+      checks=d.tp_checks||{};goal=d.tp_goal||20;lastHit=d.tp_last||null;log=d.tp_log||{};startDay=d.tp_start||today();
+      save('tp_checks',checks);save('tp_goal',goal);save('tp_last',lastHit);save('tp_log',log);save('tp_start',startDay);
+      document.getElementById('t-goal').value=String(goal);
+      renderWeeks();renderTimer();renderToday();
+      const note=document.getElementById('backup-note');note.textContent='\u2713 Backup restored successfully.';note.style.color='var(--moss2)';
+    }catch(err){
+      const note=document.getElementById('backup-note');note.textContent='Couldn\u2019t read that file \u2014 make sure it\u2019s a NicTrix backup.';note.style.color='var(--clay)';
+    }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
 function resetAll(){if(confirm('Reset everything \u2014 checkmarks, timer, and all logged hit history?')){checks={};goal=20;lastHit=null;log={};startDay=today();save('tp_checks',checks);save('tp_goal',goal);save('tp_last',lastHit);save('tp_log',log);save('tp_start',startDay);document.getElementById('t-goal').value='20';renderWeeks();renderTimer();renderToday();}}
 
 document.getElementById('t-goal').value=String(goal);
